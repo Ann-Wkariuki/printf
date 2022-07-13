@@ -1,49 +1,80 @@
+#include <stdarg.h>
 #include "main.h"
+#include <stdio.h>
 
 /**
- *_printf - prints anything
- * @format: the format string
- *
- *Return: number of bytes printed
- */
+  * _printf - produces output according to a format.
+  * @format: a character string.
+  * Return: number of characters printed(
+  * excluding the null terminator)
+  */
+
 int _printf(const char *format, ...)
 {
-	int sum = 0;
-	va_list ap;
-	char *p, *start;
-	params_t params = PARAMS_INIT;
+	int count;
+	int total = 0;
+	va_list args;
+	int flag = 0;
 
-	va_start(ap, format);
+	if (format == NULL)
+		return (0);
 
-	if (!format || (format[0] == '%' && !format[1]))
-		return (-1);
-	if (format[0] == '%' && format[1] == ' ' && !format[2])
-		return (-1);
-	for (p = (char *)format; *p; p++)
+	va_start(args, format);
+	for (count = 0; *(format + count) != '\0'; count++)
 	{
-		init_params(&params, ap);
-		if (*p != '%')
+		if (format[count] == '%')
 		{
-			sum += _putchar(*p);
-			continue;
+			flag = 1;
 		}
-		start = p;
-		p++;
-		while (get_flag(p, &params)) /* while char at p is flag char */
+		else if (flag == 1)
 		{
-			p++; /* next char */
+			flag = 0;
+			switch (format[count])
+			{
+				case 'c':
+					_putchar(va_arg(args, int));
+					total += 1;
+					break;
+				case 's':
+					total += _print_str(va_arg(args, char *));
+					break;
+				case '%':
+					_putchar('%');
+					total += 1;
+					break;
+				case 'd':
+					total += _print_int((long)(va_arg(args, int)));
+					break;
+				case 'i':
+					total += _print_int((long)(va_arg(args, int)));
+					break;
+				case 'b':
+					total += to_Binary(va_arg(args, int));
+					break;
+				case 'u':
+					total += _print_int(va_arg(args, unsigned int));
+					break;
+				case 'o':
+					total += to_Octal(va_arg(args, int));
+					break;
+				case 'x':
+					total += to_Hexa(va_arg(args, int));
+					break;
+				case 'X':
+					total += to_Hexa(va_arg(args, int));
+					break;
+				default:
+					_putchar('%');
+					_putchar(format[count]);
+					total += 2;
+			}
 		}
-		p = get_width(p, &params, ap);
-		p = get_precision(p, &params, ap);
-		if (get_modifier(p, &params))
-			p++;
-		if (!get_specifier(p))
-			sum += print_from_to(start, p,
-					params.l_modifier || params.h_modifier ? p - 1 : 0);
 		else
-			sum += get_print_func(p, ap, &params);
+		{
+			_putchar(format[count]);
+			total += 1;
+		}
 	}
-	_putchar(BUF_FLUSH);
-	va_end(ap);
-	return (sum);
+	va_end(args);
+	return (total);
 }

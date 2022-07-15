@@ -1,1 +1,1 @@
-Printf project by Ann and Jos h
+Printf project by Ann and Josh

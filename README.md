@@ -1,1 +1,1 @@
-Printf project by Ann and Josh
+Printf project by Kariuki and Adewale
